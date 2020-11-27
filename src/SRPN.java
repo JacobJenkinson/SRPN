@@ -8,10 +8,10 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
- * Program class for an SRPN calculator. Current it outputs "0" for every "=" sign.
+ * Program class for an SRPN calculator.
  */
 public class SRPN {
-    private final int MAX_RANDOM_NUMBERS = 22;
+    private final int MAX_RANDOM_NUMBERS = 22;  // SRPN only has 22 random numbers before looping back
 
     private List<Integer> randomNumbers;
     private int randomNumberIndex;
@@ -32,15 +32,20 @@ public class SRPN {
             randomNumbers.add(randomNumberGenerator.nextRandomNumber());
         }
         this.randomNumberIndex = 0;
-        this.randomNumbers =  randomNumbers;
+        this.randomNumbers = randomNumbers;
     }
 
     /**
      * @param commandString
      */
     public void processCommand(final String commandString) {
-        final Optional<String> maybeResponse = processNewCommands(commandString);
-        maybeResponse.ifPresent(System.out::print);
+        final CommandStringParser commandStringParser = new CommandStringParser();
+        final List<String> commands = commandStringParser.parseCommand(commandString);
+
+        for (String command : commands) {
+            final Optional<String> maybeResponse = processNewCommands(command);
+            maybeResponse.ifPresent(System.out::print);
+        }
     }
 
     /**
