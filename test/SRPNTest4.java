@@ -1,11 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -71,39 +67,13 @@ class SRPNTest4 {
     }
 
     @Test
-    void randomNumberTest() {
-        int r0 = 1804289383;
-        currentR = r0;
-        for (int i =0; i < 10; i++) {
-            currentR = rand(currentR);
-            System.out.println(currentR);
-        }
+    void singleLineR() {
+        final Optional<String> response1 = srpn.processNewCommands("r");
+        final Optional<String> response2 = srpn.processNewCommands("r");
+        final Optional<String> response3 = srpn.processNewCommands("r");
+        final Optional<String> d1 = srpn.processNewCommands("d");
 
-        int[] rValues = new int[100];
-        rValues[0] = 1804289383;
-        for (int i=1; i<31; i++) {
-            rValues[i] = (16807 * rValues[i-1]) % 2147483647;
-            if (rValues[i] < 0) {
-                rValues[i] += 2147483647;
-            }
-        }
-        System.out.println(rValues);
-//        for (int i=31; i<34; i++) {
-//            rValues[i] = rValues[i-31];
-//        }
-//        for (int i=34; i<344; i++) {
-//            rValues[i] = rValues[i-31] + rValues[i-3];
-//        }
-//        for (int i=344; i<1000; i++) {
-//            rValues[i] = rValues[i-31] + rValues[i-3];
-//            System.out.println("%d\n", (rValues[i]) >> 1);
-//        }
-    }
-
-    public Integer rand(final Integer intValue) {
-        final BigInteger i = BigInteger.valueOf(16807L).multiply(BigInteger.valueOf(intValue));
-        final BigInteger m = BigInteger.valueOf(2147483647L);
-        return (i.mod(m)).intValue();
+        assertEquals(Optional.of("1804289383\n846930886\n1681692777\n"), d1);
     }
 
     @Test

@@ -7,17 +7,32 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-//Comment all assumptions
-//Explain un-obvious commands like peeks
-
 /**
  * Program class for an SRPN calculator. Current it outputs "0" for every "=" sign.
  */
 public class SRPN {
+    private final int MAX_RANDOM_NUMBERS = 22;
+
+    private List<Integer> randomNumbers;
+    private int randomNumberIndex;
+
     private List<String> stack;
 
     public SRPN() {
         this.stack = new ArrayList<>();
+        initialiseRandomNumberGeneration();
+    }
+
+    // Due to the fact the SRPN uses only a limited subset of the random number generation a restricted list is
+    // created upon initialisation rather than using the RandomNumberGenerator
+    private void initialiseRandomNumberGeneration() {
+        RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
+        final List<Integer> randomNumbers = new ArrayList<>();
+        for (int i = 0; i < MAX_RANDOM_NUMBERS; i++) {
+            randomNumbers.add(randomNumberGenerator.nextRandomNumber());
+        }
+        this.randomNumberIndex = 0;
+        this.randomNumbers =  randomNumbers;
     }
 
     /**
@@ -36,14 +51,16 @@ public class SRPN {
         try {
             if (commandString.equals("=")) {
                 return getFormattedStack(true);
-            }
-            if (commandString.equals("d")) {
+            } else if (commandString.equals("d")) {
                 return getFormattedStack(false);
+            } else if (commandString.equals("r")) {
+                stack.add(randomNumbers.get(randomNumberIndex).toString());
+                randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
             } else {
                 stack.add(commandString);
                 evaluateStack();
-                return Optional.empty();
             }
+            return Optional.empty();
         } catch (IndexOutOfBoundsException ex) {
             return Optional.of("Stack empty.\n");
         } catch (EmptyStackException ex) {

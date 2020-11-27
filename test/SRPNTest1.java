@@ -1,11 +1,11 @@
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SRPNTest1 {
 
@@ -68,15 +68,17 @@ class SRPNTest1 {
         assertEquals(Optional.of("0\n"), response6);
     }
 
+    @Disabled
     @Test
     void ZeroModulus() {
         final Optional<String> response1 = srpn.processNewCommands("1");
         final Optional<String> response2 = srpn.processNewCommands("0");
-        final Optional<String> response3 = srpn.processNewCommands("%");
 
         assertEquals(Optional.empty(), response1);
         assertEquals(Optional.empty(), response2);
-        assertEquals(Optional.of("0\n"), response3);
+        final RuntimeException error = assertThrows(RuntimeException.class,
+                () -> srpn.processNewCommands("%"));
+        assertEquals(error.getMessage(), "34 Floating point exception(core dumped) ./srpn/srpn");
     }
 
     @Test
