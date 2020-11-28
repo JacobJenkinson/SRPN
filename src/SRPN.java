@@ -1,10 +1,9 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * Program class for an SRPN calculator.
@@ -35,44 +34,53 @@ public class SRPN {
         this.randomNumbers = randomNumbers;
     }
 
+    public void processCommand(final String commandString) {
+        final List<String> response = processNewCommands(commandString);
+        for (String value : response) {
+            System.out.println(value);
+        }
+    }
+
     /**
      * @param commandString
      */
-    public void processCommand(final String commandString) {
+    public List<String> processNewCommands(final String commandString) {
         final CommandStringParser commandStringParser = new CommandStringParser();
         final List<String> commands = commandStringParser.parseCommand(commandString);
 
+        final List<String> responses = new ArrayList<>();
         for (String command : commands) {
-            final Optional<String> maybeResponse = processNewCommands(command);
-            maybeResponse.ifPresent(System.out::print);
+            responses.addAll(handleExceptions(command));
+
         }
+        return responses;
     }
 
     /**
      * @param commandString
      * @return
      */
-    public Optional<String> processNewCommands(final String commandString) {
+    public List<String> handleExceptions(final String commandString) {
         try {
             return handleCommandString(commandString);
         } catch (IndexOutOfBoundsException ex) {
-            return Optional.of("Stack empty.\n");
+            return List.of("Stack empty.");
         } catch (EmptyStackException ex) {
             stack.remove(stack.size() - 1); // remove the last operator on the stack as invalid
-            return Optional.of("Stack underflow.\n");
+            return List.of("Stack underflow.");
         } catch (ArithmeticException ex) {
-            return Optional.of("Divide by 0.\n");
+            return List.of("Divide by 0.");
         } catch (StackOverflowError ex) {
-            return Optional.of("Stack overflow.\n");
+            return List.of("Stack overflow.");
         }
     }
 
-    private Optional<String> handleCommandString(final String commandString) {
+    private List<String> handleCommandString(final String commandString) {
         switch (commandString) {
             case "=":
-                return Optional.of(stack.get(stack.size() - 1));
+                return List.of(stack.get(stack.size() - 1));
             case "d":
-                return getFormattedStack();
+                return stack;
             case "r":
                 stack.add(randomNumbers.get(randomNumberIndex).toString());
                 randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
@@ -81,11 +89,7 @@ public class SRPN {
                 stack.add(commandString);
                 evaluateStack();
         }
-        return Optional.empty();
-    }
-
-    private Optional<String> getFormattedStack() {
-        return Optional.of(stack.stream().map(stackValue -> stackValue + "\n").collect(Collectors.joining()));
+        return Collections.emptyList();
     }
 
     private void evaluateStack() {

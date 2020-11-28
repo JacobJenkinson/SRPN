@@ -1,9 +1,11 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 class SRPNTest3 {
 
@@ -17,64 +19,65 @@ class SRPNTest3 {
 
     @Test
     void LargeInteger() {
-        final Optional<String> response1 = srpn.processNewCommands("2147483648");
-        final Optional<String> response2 = srpn.processNewCommands("1");
-        final Optional<String> response3 = srpn.processNewCommands("+");
-        final Optional<String> response4 = srpn.processNewCommands("=");
+        final List<String> response1 = srpn.processNewCommands("2147483648");
+        final List<String> response2 = srpn.processNewCommands("1");
+        final List<String> response3 = srpn.processNewCommands("+");
+        final List<String> response4 = srpn.processNewCommands("=");
 
-        assertEquals(Optional.empty(), response1);
-        assertEquals(Optional.empty(), response2);
-        assertEquals(Optional.empty(), response3);
-        assertEquals(Optional.of("2147483647\n"), response4);
+        assertThat(response1, is(Collections.emptyList()));
+        assertThat(response2, is(Collections.emptyList()));
+        assertThat(response3, is(Collections.emptyList()));
+        assertThat(response4, is(List.of("2147483647")));
     }
 
 
     @Test
     void Test1() {
-        final Optional<String> response1 = srpn.processNewCommands("2147483647");
-        final Optional<String> response2 = srpn.processNewCommands("1");
-        final Optional<String> response3 = srpn.processNewCommands("+");
-        final Optional<String> response4 = srpn.processNewCommands("=");
+        final List<String> response1 = srpn.processNewCommands("2147483647");
+        final List<String> response2 = srpn.processNewCommands("1");
+        final List<String> response3 = srpn.processNewCommands("+");
+        final List<String> response4 = srpn.processNewCommands("=");
 
-        assertEquals(Optional.empty(), response1);
-        assertEquals(Optional.empty(), response2);
-        assertEquals(Optional.empty(), response3);
-        assertEquals(Optional.of("2147483647\n"), response4);
+        assertThat(response1, is(Collections.emptyList()));
+        assertThat(response2, is(Collections.emptyList()));
+        assertThat(response3, is(Collections.emptyList()));
+        assertThat(response4, is(List.of("2147483647")));
     }
 
     @Test
     void Test2() {
-        final Optional<String> response1 = srpn.processNewCommands("-2147483647");
-        final Optional<String> response2 = srpn.processNewCommands("1");
-        final Optional<String> response3 = srpn.processNewCommands("-");
-        final Optional<String> response4 = srpn.processNewCommands("=");
-        final Optional<String> response5 = srpn.processNewCommands("20");
-        final Optional<String> response6 = srpn.processNewCommands("-");
-        final Optional<String> response7 = srpn.processNewCommands("=");
+        final List<String> response1 = srpn.processNewCommands("-2147483647");
+        final List<String> response2 = srpn.processNewCommands("1");
+        final List<String> response3 = srpn.processNewCommands("-");
+        final List<String> response4 = srpn.processNewCommands("=");
+        final List<String> response5 = srpn.processNewCommands("20");
+        final List<String> response6 = srpn.processNewCommands("-");
+        final List<String> response7 = srpn.processNewCommands("=");
 
-        assertEquals(Optional.empty(), response1);
-        assertEquals(Optional.empty(), response2);
-        assertEquals(Optional.empty(), response3);
-        assertEquals(Optional.of("-2147483648\n"), response4);
-        assertEquals(Optional.empty(), response5);
-        assertEquals(Optional.empty(), response6);
-        assertEquals(Optional.of("-2147483648\n"), response7);
+        assertThat(response1, is(Collections.emptyList()));
+        assertThat(response2, is(Collections.emptyList()));
+        assertThat(response3, is(Collections.emptyList()));
+        assertThat(response4, is(List.of("-2147483648")));
+        assertThat(response5, is(Collections.emptyList()));
+        assertThat(response6, is(Collections.emptyList()));
+        assertThat(response7, is(List.of("-2147483648")));
     }
 
     @Test
     void Test3() {
-        final Optional<String> response1 = srpn.processNewCommands("100000");
-        final Optional<String> response2 = srpn.processNewCommands("0");
-        final Optional<String> response3 = srpn.processNewCommands("-");
-        final Optional<String> d1 = srpn.processNewCommands("d");
-        final Optional<String> response5 = srpn.processNewCommands("*");
-        final Optional<String> response6 = srpn.processNewCommands("=");
+        final List<String> response1 = srpn.processNewCommands("100000");
+        final List<String> response2 = srpn.processNewCommands("0");
+        final List<String> response3 = srpn.processNewCommands("-");
+        final List<String> d1 = srpn.processNewCommands("d");
+        final List<String> response5 = srpn.processNewCommands("*");
+        final List<String> response6 = srpn.processNewCommands("=");
 
-        assertEquals(Optional.empty(), response1);
-        assertEquals(Optional.empty(), response2);
-        assertEquals(Optional.empty(), response3);
-        assertEquals(Optional.of("100000\n"), d1);
-        assertEquals(Optional.of("Stack underflow.\n"), response5);
-        assertEquals(Optional.of("100000\n"), response6);
+
+        assertThat(response1, is(Collections.emptyList()));
+        assertThat(response2, is(Collections.emptyList()));
+        assertThat(response3, is(Collections.emptyList()));
+        assertThat(d1, is(List.of("100000")));
+        assertThat(response5, is(List.of("Stack underflow.")));
+        assertThat(response6, is(List.of("100000")));
     }
 }

@@ -29,6 +29,12 @@ class CommandStringParserTest {
     }
 
     @Test
+    void parseSingleNegativeValue() {
+        final List<String> commands = commandStringParser.parseCommand("-1");
+        assertThat(commands, contains("-1"));
+    }
+
+    @Test
     void parseSingleValueWithWhitespace() {
         final List<String> commands = commandStringParser.parseCommand("      1");
         assertThat(commands, contains("1"));
