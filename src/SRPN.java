@@ -1,6 +1,5 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Optional;
@@ -11,15 +10,16 @@ import java.util.stream.Collectors;
  * Program class for an SRPN calculator.
  */
 public class SRPN {
-    private final int MAX_RANDOM_NUMBERS = 22;  // SRPN only has 22 random numbers before looping back
+    private final int MAX_STACK_SIZE = 23;    // SRPN can only store 22 integers in memory
+    private final int MAX_RANDOM_NUMBERS = 22;      // SRPN only has 22 random numbers before looping back
 
     private List<Integer> randomNumbers;
     private int randomNumberIndex;
 
-    private List<String> stack;
+    private SizedArrayList<String> stack;
 
     public SRPN() {
-        this.stack = new ArrayList<>();
+        this.stack = new SizedArrayList<>(MAX_STACK_SIZE);
         initialiseRandomNumberGeneration();
     }
 
@@ -55,9 +55,9 @@ public class SRPN {
     public Optional<String> processNewCommands(final String commandString) {
         try {
             if (commandString.equals("=")) {
-                return getFormattedStack(true);
+                return Optional.of(stack.get(stack.size() - 1));
             } else if (commandString.equals("d")) {
-                return getFormattedStack(false);
+                return getFormattedStack();
             } else if (commandString.equals("r")) {
                 stack.add(randomNumbers.get(randomNumberIndex).toString());
                 randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
@@ -73,19 +73,18 @@ public class SRPN {
             return Optional.of("Stack underflow.\n");
         } catch (ArithmeticException ex) {
             return Optional.of("Divide by 0.\n");
+        } catch (StackOverflowError ex) {
+            return Optional.of("Stack overflow.\n");
         }
     }
 
-    private Optional<String> getFormattedStack(final boolean onlyLastItem) {
-        final int fromIndex = onlyLastItem ? stack.size() - 1 : 0;
-        return Optional.of(stack.subList(fromIndex, stack.size()).stream().map(stackValue -> stackValue + "\n").collect(Collectors.joining()));
+    private Optional<String> getFormattedStack() {
+        return Optional.of(stack.stream().map(stackValue -> stackValue + "\n").collect(Collectors.joining()));
     }
 
     private void evaluateStack() {
         Stack<Integer> intStack = calculateStackValue();
-        stack = Arrays.stream(intStack.toArray())
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        stack = SizedArrayList.from(intStack, MAX_STACK_SIZE);
     }
 
     private Stack<Integer> calculateStackValue() {

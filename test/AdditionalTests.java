@@ -1,5 +1,4 @@
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -40,7 +39,6 @@ class AdditionalTests {
         assertEquals(Optional.of("-2147483648"), response1);
     }
 
-    @Disabled
     @Test
     void ZeroModulus() {
         final Optional<String> response1 = srpn.processNewCommands("1");
