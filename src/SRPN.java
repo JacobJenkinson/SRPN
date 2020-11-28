@@ -20,6 +20,7 @@ public class SRPN {
     public SRPN() {
         this.stack = new SizedArrayList<>(MAX_STACK_SIZE);
         initialiseRandomNumberGeneration();
+        System.out.println("You can now start interacting with the SRPN calculator");
     }
 
     // Due to the fact the SRPN uses only a limited subset of the random number generation a restricted list is
@@ -100,7 +101,8 @@ public class SRPN {
                     intStack.push(intStack.pop() * intStack.pop());
                     break;
                 case '^':
-                    intStack.push(intStack.pop() ^ intStack.pop());
+                    int power = intStack.pop(), value = intStack.pop();
+                    intStack.push((int) Math.pow(value, power));
                     break;
                 case '+':
                     intStack.push(safeAdd(intStack.pop(), intStack.pop()));
