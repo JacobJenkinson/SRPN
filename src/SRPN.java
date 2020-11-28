@@ -54,18 +54,7 @@ public class SRPN {
      */
     public Optional<String> processNewCommands(final String commandString) {
         try {
-            if (commandString.equals("=")) {
-                return Optional.of(stack.get(stack.size() - 1));
-            } else if (commandString.equals("d")) {
-                return getFormattedStack();
-            } else if (commandString.equals("r")) {
-                stack.add(randomNumbers.get(randomNumberIndex).toString());
-                randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
-            } else {
-                stack.add(commandString);
-                evaluateStack();
-            }
-            return Optional.empty();
+            return handleCommandString(commandString);
         } catch (IndexOutOfBoundsException ex) {
             return Optional.of("Stack empty.\n");
         } catch (EmptyStackException ex) {
@@ -78,21 +67,36 @@ public class SRPN {
         }
     }
 
+    private Optional<String> handleCommandString(final String commandString) {
+        switch (commandString) {
+            case "=":
+                return Optional.of(stack.get(stack.size() - 1));
+            case "d":
+                return getFormattedStack();
+            case "r":
+                stack.add(randomNumbers.get(randomNumberIndex).toString());
+                randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
+                break;
+            default:
+                stack.add(commandString);
+                evaluateStack();
+        }
+        return Optional.empty();
+    }
+
     private Optional<String> getFormattedStack() {
         return Optional.of(stack.stream().map(stackValue -> stackValue + "\n").collect(Collectors.joining()));
     }
 
     private void evaluateStack() {
-        Stack<Integer> intStack = calculateStackValue();
-        stack = SizedArrayList.from(intStack, MAX_STACK_SIZE);
-    }
-
-    private Stack<Integer> calculateStackValue() {
         final Stack<Integer> intStack = new Stack<>();
         for (String stackValue : stack) {
             switch (stackValue.charAt(stackValue.length() - 1)) {
                 case '*':
                     intStack.push(intStack.pop() * intStack.pop());
+                    break;
+                case '^':
+                    intStack.push(intStack.pop() ^ intStack.pop());
                     break;
                 case '+':
                     intStack.push(safeAdd(intStack.pop(), intStack.pop()));
@@ -106,6 +110,7 @@ public class SRPN {
                     intStack.push(numerator / denominator);
                     break;
                 case '%':
+                    checkModulus(intStack.peek());
                     int divisor = intStack.pop(), dividend = intStack.pop();
                     intStack.push(dividend % divisor);
                     break;
@@ -114,7 +119,7 @@ public class SRPN {
                     break;
             }
         }
-        return intStack;
+        stack = SizedArrayList.from(intStack, MAX_STACK_SIZE);
     }
 
     static int safeAdd(int num1, int num2) {
@@ -137,9 +142,15 @@ public class SRPN {
         return -a;
     }
 
-    static void checkDivision(final Integer peek) {
-        if (peek == 0) {
+    static void checkDivision(final Integer denominator) {
+        if (denominator == 0) {
             throw new ArithmeticException("Divided by zero");
+        }
+    }
+
+    static void checkModulus(final Integer divisor) {
+        if (divisor == 0) {
+            throw new FloatingPointException("exit status 136");
         }
     }
 
