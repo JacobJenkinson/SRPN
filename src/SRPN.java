@@ -97,6 +97,9 @@ public class SRPN {
         final Stack<Integer> intStack = new Stack<>();
         for (String stackValue : stack) {
             switch (stackValue.charAt(stackValue.length() - 1)) {
+                case '-':
+                    intStack.push(safeAdd(safeNegate(intStack.pop()), intStack.pop()));
+                    break;
                 case '*':
                     intStack.push(intStack.pop() * intStack.pop());
                     break;
@@ -106,9 +109,6 @@ public class SRPN {
                     break;
                 case '+':
                     intStack.push(safeAdd(intStack.pop(), intStack.pop()));
-                    break;
-                case '-':
-                    intStack.push(safeAdd(safeNegate(intStack.pop()), intStack.pop()));
                     break;
                 case '/':
                     checkDivision(intStack.peek());

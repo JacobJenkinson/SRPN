@@ -54,9 +54,21 @@ class CommandStringParserTest {
     }
 
     @Test
-    void equalsSeperation() {
+    void equalsSeparation() {
         final List<String> commands = commandStringParser.parseCommand("11=4");
         assertThat(commands, contains("11", "=", "4"));
+    }
+
+    @Test
+    void weirdOperatorNextToEqualsBehaviour() {
+        final List<String> commands = commandStringParser.parseCommand("11 4 +=");
+        assertThat(commands, contains("11", "4", "=", "+"));
+    }
+
+    @Test
+    void weirdOperatorNotNextToEqualsBehaviour() {
+        final List<String> commands = commandStringParser.parseCommand("11 4 + =");
+        assertThat(commands, contains("11", "4", "+", "="));
     }
 
     @Test
