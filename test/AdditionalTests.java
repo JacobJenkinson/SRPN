@@ -53,4 +53,10 @@ class AdditionalTests {
                 () -> srpn.processNewCommands("%"));
         assertEquals(error.getMessage(), "exit status 136");
     }
+
+    @Test
+    void GoingOverLimitThenUsingOperator() {
+        final List<String> response1 = srpn.processNewCommands("1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 = 4 + =");
+        assertThat(response1, is(List.of("3", "Stack overflow.", "5")));
+    }
 }

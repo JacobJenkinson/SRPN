@@ -57,11 +57,7 @@ public class SRPN {
         return responses;
     }
 
-    /**
-     * @param commandString
-     * @return
-     */
-    public List<String> handleExceptions(final String commandString) {
+    private List<String> handleExceptions(final String commandString) {
         try {
             return handleCommandString(commandString);
         } catch (IndexOutOfBoundsException ex) {
@@ -98,26 +94,32 @@ public class SRPN {
         for (String stackValue : stack) {
             switch (stackValue.charAt(stackValue.length() - 1)) {
                 case '-':
-                    intStack.push(safeAdd(safeNegate(intStack.pop()), intStack.pop()));
+                    intStack.push(MathUtilFunctions.safeAdd(MathUtilFunctions.safeNegate(intStack.pop()), intStack.pop()));
                     break;
                 case '*':
                     intStack.push(intStack.pop() * intStack.pop());
                     break;
                 case '^':
-                    checkPower(intStack.peek());
+                    if (intStack.peek() < 0) {
+                        throw new ArithmeticException("Negative power.");
+                    }
                     int power = intStack.pop(), value = intStack.pop();
                     intStack.push((int) Math.pow(value, power));
                     break;
                 case '+':
-                    intStack.push(safeAdd(intStack.pop(), intStack.pop()));
+                    intStack.push(MathUtilFunctions.safeAdd(intStack.pop(), intStack.pop()));
                     break;
                 case '/':
-                    checkDivision(intStack.peek());
+                    if (intStack.peek() == 0) {
+                        throw new ArithmeticException("Divide by 0.");
+                    }
                     int denominator = intStack.pop(), numerator = intStack.pop();
                     intStack.push(numerator / denominator);
                     break;
                 case '%':
-                    checkModulus(intStack.peek());
+                    if (intStack.peek() == 0) {
+                        throw new FloatingPointException("exit status 136");
+                    }
                     int divisor = intStack.pop(), dividend = intStack.pop();
                     intStack.push(dividend % divisor);
                     break;
@@ -127,44 +129,6 @@ public class SRPN {
             }
         }
         stack = SizedArrayList.from(intStack, MAX_STACK_SIZE);
-    }
-
-    static int safeAdd(int num1, int num2) {
-        if (num2 > 0) {
-            if (num1 > Integer.MAX_VALUE - num2) {
-                return Integer.MAX_VALUE;
-            }
-        } else {
-            if (num1 < Integer.MIN_VALUE - num2) {
-                return Integer.MIN_VALUE;
-            }
-        }
-        return num1 + num2;
-    }
-
-    static int safeNegate(int a) {
-        if (a == Integer.MIN_VALUE) {
-            return Integer.MAX_VALUE;
-        }
-        return -a;
-    }
-
-    static void checkPower(final Integer power) {
-        if (power < 0) {
-            throw new ArithmeticException("Negative power.");
-        }
-    }
-
-    static void checkDivision(final Integer denominator) {
-        if (denominator == 0) {
-            throw new ArithmeticException("Divide by 0.");
-        }
-    }
-
-    static void checkModulus(final Integer divisor) {
-        if (divisor == 0) {
-            throw new FloatingPointException("exit status 136");
-        }
     }
 
     private int getCappedIntegerValue(final String stackValue) {
