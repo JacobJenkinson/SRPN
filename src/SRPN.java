@@ -70,7 +70,7 @@ public class SRPN {
             stack.remove(stack.size() - 1); // remove the last operator on the stack as invalid
             return List.of("Stack underflow.");
         } catch (ArithmeticException ex) {
-            return List.of("Divide by 0.");
+            return List.of(ex.getMessage());
         } catch (StackOverflowError ex) {
             return List.of("Stack overflow.");
         }
@@ -81,7 +81,7 @@ public class SRPN {
             case "=":
                 return List.of(stack.get(stack.size() - 1));
             case "d":
-                return stack;
+                return stack.isEmpty() ? Collections.singletonList(String.valueOf(Integer.MIN_VALUE)) : stack;
             case "r":
                 stack.add(randomNumbers.get(randomNumberIndex).toString());
                 randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
@@ -104,6 +104,7 @@ public class SRPN {
                     intStack.push(intStack.pop() * intStack.pop());
                     break;
                 case '^':
+                    checkPower(intStack.peek());
                     int power = intStack.pop(), value = intStack.pop();
                     intStack.push((int) Math.pow(value, power));
                     break;
@@ -148,9 +149,15 @@ public class SRPN {
         return -a;
     }
 
+    static void checkPower(final Integer power) {
+        if (power < 0) {
+            throw new ArithmeticException("Negative power.");
+        }
+    }
+
     static void checkDivision(final Integer denominator) {
         if (denominator == 0) {
-            throw new ArithmeticException("Divided by zero");
+            throw new ArithmeticException("Divide by 0.");
         }
     }
 
