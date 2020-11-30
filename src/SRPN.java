@@ -77,7 +77,20 @@ public class SRPN {
             return List.of(ex.getMessage());
         } catch (StackOverflowError ex) {
             return List.of("Stack overflow.");
+        } catch (NumberFormatException ex) {
+            return handleInvalidInput();
         }
+    }
+
+    // Create list of error messages for each invalid char in invalid input
+    private List<String> handleInvalidInput() {
+        final String invalidInput = stack.get(stack.size() - 1);
+        final List<String> response = new ArrayList<>();
+        for (char character : invalidInput.toCharArray()) {
+            response.add("Unrecognised operator or operand \"" + character + "\".");
+        }
+        stack.remove(stack.size() - 1);     // remove the last value on the stack as invalid
+        return response;
     }
 
     // Determines action based on input
