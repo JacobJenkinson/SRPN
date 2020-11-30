@@ -4,7 +4,6 @@ import java.util.Stack;
 /**
  * Extension of ArrayList which throws exceptions on addition if more than the specified number of values are added
  * with the exception of non integers which behave the same as a standard ArrayList
- *
  */
 public class SizedArrayList<T> extends ArrayList<T> {
     private final int maxSize;

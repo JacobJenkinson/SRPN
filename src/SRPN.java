@@ -1,4 +1,3 @@
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EmptyStackException;
@@ -9,10 +8,10 @@ import java.util.Stack;
  * Program class for an SRPN calculator.
  */
 public class SRPN {
-    private final int MAX_STACK_SIZE = 23;    // SRPN can only store 22 integers in memory
+    private final int MAX_STACK_SIZE = 23;          // SRPN can only store 22 integers in memory
     private final int MAX_RANDOM_NUMBERS = 22;      // SRPN only has 22 random numbers before looping back
 
-    private List<Integer> randomNumbers;
+    private List<String> randomNumbers;
     private int randomNumberIndex;
 
     private SizedArrayList<String> stack;
@@ -27,14 +26,19 @@ public class SRPN {
     // created upon initialisation rather than using the RandomNumberGenerator
     private void initialiseRandomNumberGeneration() {
         RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
-        final List<Integer> randomNumbers = new ArrayList<>();
+        final List<String> randomNumbers = new ArrayList<>();
         for (int i = 0; i < MAX_RANDOM_NUMBERS; i++) {
-            randomNumbers.add(randomNumberGenerator.nextRandomNumber());
+            randomNumbers.add(randomNumberGenerator.nextRandomNumber().toString());
         }
         this.randomNumberIndex = 0;
         this.randomNumbers = randomNumbers;
     }
 
+    /**
+     * Delegates to processNewCommands function and prints out response to std out.
+     *
+     * @param commandString string to be processed
+     */
     public void processCommand(final String commandString) {
         final List<String> response = processNewCommands(commandString);
         for (String value : response) {
@@ -43,7 +47,10 @@ public class SRPN {
     }
 
     /**
-     * @param commandString
+     * Carries out all functionality of the SRPN by parsing the commandString and then carrying out the relevant
+     * operations.
+     *
+     * @param commandString string to be processed
      */
     public List<String> processNewCommands(final String commandString) {
         final CommandStringParser commandStringParser = new CommandStringParser();
@@ -51,19 +58,20 @@ public class SRPN {
 
         final List<String> responses = new ArrayList<>();
         for (String command : commands) {
-            responses.addAll(handleExceptions(command));
+            responses.addAll(handleCommandStringWithExceptionControl(command));
 
         }
         return responses;
     }
 
-    private List<String> handleExceptions(final String commandString) {
+    // Delegates to handleCommandString but catches any expected exceptions and handles them gracefully
+    private List<String> handleCommandStringWithExceptionControl(final String commandString) {
         try {
             return handleCommandString(commandString);
         } catch (IndexOutOfBoundsException ex) {
             return List.of("Stack empty.");
         } catch (EmptyStackException ex) {
-            stack.remove(stack.size() - 1); // remove the last operator on the stack as invalid
+            stack.remove(stack.size() - 1);     // remove the last operator on the stack as invalid
             return List.of("Stack underflow.");
         } catch (ArithmeticException ex) {
             return List.of(ex.getMessage());
@@ -72,14 +80,17 @@ public class SRPN {
         }
     }
 
+    // Determines action based on input
     private List<String> handleCommandString(final String commandString) {
         switch (commandString) {
             case "=":
                 return List.of(stack.get(stack.size() - 1));
             case "d":
+                // ternary operator to support behaviour of d when stack is empty to return Integer.MIN_VALUE
                 return stack.isEmpty() ? Collections.singletonList(String.valueOf(Integer.MIN_VALUE)) : stack;
             case "r":
-                stack.add(randomNumbers.get(randomNumberIndex).toString());
+                stack.add(randomNumbers.get(randomNumberIndex));
+                // increase the index and modules the max number of random numbers to create looping effect of r
                 randomNumberIndex = (randomNumberIndex + 1) % MAX_RANDOM_NUMBERS;
                 break;
             default:
@@ -89,6 +100,7 @@ public class SRPN {
         return Collections.emptyList();
     }
 
+    // evaluates the current state of the stack
     private void evaluateStack() {
         final Stack<Integer> intStack = new Stack<>();
         for (String stackValue : stack) {
@@ -97,7 +109,7 @@ public class SRPN {
                     intStack.push(MathUtilFunctions.safeAdd(MathUtilFunctions.safeNegate(intStack.pop()), intStack.pop()));
                     break;
                 case '*':
-                    intStack.push(intStack.pop() * intStack.pop());
+                    intStack.push(MathUtilFunctions.safeMultiply(intStack.pop(), intStack.pop()));
                     break;
                 case '^':
                     if (intStack.peek() < 0) {
@@ -124,21 +136,10 @@ public class SRPN {
                     intStack.push(dividend % divisor);
                     break;
                 default:
-                    intStack.push(getCappedIntegerValue(stackValue));
+                    intStack.push(MathUtilFunctions.getCappedIntegerValue(stackValue));
                     break;
             }
         }
         stack = SizedArrayList.from(intStack, MAX_STACK_SIZE);
-    }
-
-    private int getCappedIntegerValue(final String stackValue) {
-        final BigInteger unCappedValue = new BigInteger(stackValue);
-        if (unCappedValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-            return Integer.MAX_VALUE;
-        } else if (unCappedValue.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
-            return Integer.MIN_VALUE;
-        } else {
-            return Integer.parseInt(stackValue);
-        }
     }
 }

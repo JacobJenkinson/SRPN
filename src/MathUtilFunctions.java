@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+
 /**
  * Class to house all the utility methods to support saturation
  */
@@ -34,5 +36,36 @@ public class MathUtilFunctions {
             return Integer.MAX_VALUE;
         }
         return -a;
+    }
+
+    /**
+     * Given two integers returns their product capped at Integer.MAX_VALUE and Integer.MIN_VALUE
+     *
+     * @param num1 to be added
+     * @param num2 to be added
+     * @return their product
+     */
+    public static int safeMultiply(int num1, int num2) {
+        final BigInteger bigNum1 = BigInteger.valueOf(num1);
+        final BigInteger bigNum2 = BigInteger.valueOf(num2);
+        final BigInteger product = bigNum1.multiply(bigNum2);
+        return getCappedIntegerValue(product.toString());
+    }
+
+    /**
+     * Given a string representation of an integer returns its value capped at Integer.MAX_VALUE and Integer.MIN_VALUE
+     *
+     * @param intValue to be capped
+     * @return capped value
+     */
+    public static int getCappedIntegerValue(final String intValue) {
+        final BigInteger unCappedValue = new BigInteger(intValue);
+        if (unCappedValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+            return Integer.MAX_VALUE;
+        } else if (unCappedValue.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+            return Integer.MIN_VALUE;
+        } else {
+            return Integer.parseInt(intValue);
+        }
     }
 }
