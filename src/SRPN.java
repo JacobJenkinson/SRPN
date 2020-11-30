@@ -74,6 +74,7 @@ public class SRPN {
             stack.remove(stack.size() - 1);     // remove the last operator on the stack as invalid
             return List.of("Stack underflow.");
         } catch (ArithmeticException ex) {
+            stack.remove(stack.size() - 1);     // remove the last operator on the stack as invalid
             return List.of(ex.getMessage());
         } catch (StackOverflowError ex) {
             return List.of("Stack overflow.");
