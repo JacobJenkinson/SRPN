@@ -14,11 +14,11 @@ public class MathUtilFunctions {
      */
     public static int safeAdd(int num1, int num2) {
         if (num2 > 0) {
-            if (num1 > Integer.MAX_VALUE - num2) {
+            if (num1 > Integer.MAX_VALUE - num2) {      // checking whether num1 + num2 > Integer.MAX_VALUE
                 return Integer.MAX_VALUE;
             }
         } else {
-            if (num1 < Integer.MIN_VALUE - num2) {
+            if (num1 < Integer.MIN_VALUE - num2) {      // checking whether num1 + num2 < Integer.MIN_VALUE
                 return Integer.MIN_VALUE;
             }
         }

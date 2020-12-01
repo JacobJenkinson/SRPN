@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CommandStringParser {
-    private boolean isNotInCommentMode = true;
+    private boolean isNotInCommentMode = true;      //field represents state of whether input is treated as a comment
 
     public List<String> parseCommand(final String command) {
         if (command.isBlank()) {
@@ -18,7 +18,9 @@ public class CommandStringParser {
     private List<String> separateCommandStringIntoCommands(final String command) {
         final String commandStringWithSwappedEquals = swapWhenEqualsNextToOperator(command);
         final String possibleSeparators = "+*%^/=rd";
-        final String regex = "(?<=[" + possibleSeparators + "])|(?=[" + possibleSeparators + "])| ";
+        //positive lookbehind ?<= or lookahead ?= where a single character matches any values in the possibleSeparators
+        //or any whitespace denoted by \s
+        final String regex = "(?<=[" + possibleSeparators + "])|(?=[" + possibleSeparators + "])|\\s";
         final List<String> parsedCommands = Stream.of(commandStringWithSwappedEquals.split(regex))
                 .filter(cmd -> !cmd.isBlank())
                 .map(String::trim).collect(Collectors.toList());
@@ -78,7 +80,7 @@ public class CommandStringParser {
         }
     }
 
-
+    //finds positions in the array where the given string is equal to its contents
     private List<Integer> findCommandPositions(final List<String> commandArray, final String commandToSearch) {
         final List<Integer> positions = new ArrayList<>();
         for (int i = 0; i < commandArray.size(); i++) {

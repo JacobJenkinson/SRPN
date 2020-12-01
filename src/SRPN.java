@@ -59,7 +59,6 @@ public class SRPN {
         final List<String> responses = new ArrayList<>();
         for (String command : commands) {
             responses.addAll(handleCommandStringWithExceptionControl(command));
-
         }
         return responses;
     }
@@ -120,6 +119,7 @@ public class SRPN {
         for (String stackValue : stack) {
             switch (stackValue.charAt(stackValue.length() - 1)) {
                 case '-':
+                    // negation and addition is equivalent to subtraction and reduces complexity
                     intStack.push(MathUtilFunctions.safeAdd(MathUtilFunctions.safeNegate(intStack.pop()), intStack.pop()));
                     break;
                 case '*':
@@ -144,7 +144,7 @@ public class SRPN {
                     break;
                 case '%':
                     if (intStack.peek() == 0) {
-                        throw new FloatingPointException("exit status 136");
+                        throw new FloatingPointException("exit status 136");    //error message mimics SRPN
                     }
                     int divisor = intStack.pop(), dividend = intStack.pop();
                     intStack.push(dividend % divisor);

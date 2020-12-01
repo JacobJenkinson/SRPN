@@ -18,6 +18,7 @@ public class RandomNumberGenerator {
     private List<Integer> generateRandomNumberArray(final int seed) {
         List<Integer> r = new ArrayList<>();
         r.add(seed);
+        // the algorithm below follows that referenced in the source to generate an initial collection of integers
         for (int i = 1; i < 31; i++) {
             final int rValue = (int) ((16807L * r.get(i - 1)) % 2147483647);
             r.add(rValue < 0 ? rValue + 2147483647 : rValue);   // ensure value is in range 0 - 2147483647
@@ -39,6 +40,7 @@ public class RandomNumberGenerator {
     public Integer nextRandomNumber() {
         final int index = randomNumberArray.size();
         randomNumberArray.add(randomNumberArray.get(index - 31) + randomNumberArray.get(index - 3));
+        // here >>> is the unsigned right bit-shift operator, its needed as shown in the source
         return randomNumberArray.get(index - 1) >>> 1;
     }
 }
